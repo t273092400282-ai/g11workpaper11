@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نشاط تفاعلي: حذف البيانات - ورقة عمل (11)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #7C3AED;
+      --primary-light: #A78BFA;
+      --secondary: #EC4899;
+      --accent: #06B6D4;
+      --accent-yellow: #F59E0B;
+      --success: #10B981;
+      --danger: #EF4444;
+      --pycharm-bg: #1E1F22;
+      --pycharm-sidebar: #2B2D30;
+      --pycharm-line: #4E5157;
+      --pycharm-keyword: #CF8E6D;
+      --pycharm-string: #6AAB73;
+      --pycharm-func: #56A8F5;
+      --pycharm-comment: #7A7E85;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+    body { background: linear-gradient(135deg, #FDF4FF 0%, #EFF6FF 50%, #F0FDF4 100%); color: #1E293B; min-height: 100vh; padding: 24px 16px; }
+    .container { max-width: 1050px; margin: 0 auto; }
+
+    /* Header */
+    .header-card {
+      background: white; border-radius: 20px; padding: 24px;
+      box-shadow: 0 10px 25px -5px rgba(124, 58, 237, 0.1); border: 2px solid #E9D5FF;
+      margin-bottom: 24px; position: relative; overflow: hidden;
+    }
+    .header-card::before {
+      content: ''; position: absolute; top: 0; right: 0; left: 0; height: 6px;
+      background: linear-gradient(90deg, #EC4899, #8B5CF6, #3B82F6, #10B981);
+    }
+    .title-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+    .main-title { font-size: 1.5rem; font-weight: 800; background: linear-gradient(45deg, #7C3AED, #EC4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .badge { background: #EDE9FE; color: #7C3AED; padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 0.9rem; }
+    .student-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; background: #FAF5FF; padding: 16px; border-radius: 14px; border: 1px dashed #C084FC; }
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    .field-group label { font-weight: 700; font-size: 0.95rem; color: #581C87; }
+    .field-group input { padding: 10px 14px; border: 1.5px solid #D8B4FE; border-radius: 10px; font-size: 1rem; outline: none; background: white; }
+
+    /* Cards */
+    .section-card { background: white; border-radius: 20px; padding: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.04); margin-bottom: 24px; border: 1px solid #F1F5F9; }
+    .section-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; color: #1E293B; }
+    .task-banner { background: #FEF3C7; border-right: 5px solid #F59E0B; padding: 14px 18px; border-radius: 12px; margin-bottom: 20px; font-weight: 600; color: #92400E; }
+    
+    /* Table Container - من اليسار لليمين LTR */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1.5px solid #E2E8F0;
+      margin-bottom: 16px;
+      direction: ltr; /* اتجاه الجدول من اليسار إلى اليمين */
+      text-align: left;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: center;
+      font-size: 0.95rem;
+      direction: ltr;
+    }
+    th {
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      color: white;
+      padding: 12px 10px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #F1F5F9;
+      font-weight: 600;
+    }
+    .row-target { background-color: #FEE2E2 !important; color: #991B1B; }
+    .chip-del { background: #EF4444; color: white; padding: 4px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; display: inline-block; }
+    .chip-keep { background: #10B981; color: white; padding: 4px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; display: inline-block; }
+
+    /* PyCharm Simulator */
+    .pycharm-window { background: var(--pycharm-bg); border-radius: 14px; overflow: hidden; box-shadow: 0 12px 30px rgba(0,0,0,0.35); direction: ltr; font-family: 'JetBrains Mono', monospace; }
+    .pycharm-header { background: var(--pycharm-sidebar); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #1E1F22; }
+    .pycharm-tabs { background: var(--pycharm-bg); color: #DFE1E5; padding: 6px 14px; border-radius: 6px 6px 0 0; font-size: 0.85rem; border-top: 2px solid #3574F0; }
+    .pycharm-editor { display: flex; padding: 14px 0; font-size: 0.95rem; line-height: 1.7; }
+    .line-numbers { width: 44px; text-align: right; padding-right: 12px; color: var(--pycharm-line); user-select: none; }
+    .code-area { flex: 1; padding-right: 18px; color: #BCBEC4; }
+    .c-kw { color: var(--pycharm-keyword); }
+    .c-str { color: var(--pycharm-string); }
+    .c-fn { color: var(--pycharm-func); }
+    .c-cm { color: var(--pycharm-comment); font-style: italic; }
+
+    /* مكان مخصص لكتابة المتعلمة */
+    .student-code-box {
+      margin: 8px 0;
+      background: #26282E;
+      border: 2px dashed #3574F0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      box-shadow: 0 0 12px rgba(53, 116, 240, 0.15);
+      position: relative;
+    }
+    .student-code-box:focus-within {
+      border: 2px solid #3574F0;
+      box-shadow: 0 0 15px rgba(53, 116, 240, 0.4);
+    }
+    .box-tag {
+      font-size: 0.75rem;
+      background: #3574F0;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 6px;
+      font-family: 'Cairo', sans-serif;
+    }
+    .code-textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: #A8FF60;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      outline: none;
+      resize: vertical;
+      min-height: 60px;
+    }
+    .code-textarea::placeholder {
+      color: #555A64;
+      font-style: italic;
+      font-size: 0.9rem;
+    }
+
+    .output-panel { background: #18191B; border-top: 1px solid #2B2D30; padding: 12px 16px; color: #6AAB73; font-size: 0.9rem; direction: rtl; display: flex; justify-content: space-between; }
+
+    /* Actions */
+    .actions-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .btn { padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 0.95rem; border: none; cursor: pointer; color: white; transition: 0.2s; }
+    .btn-test { background: #10B981; }
+    .btn-pdf { background: #EF4444; }
+    .btn-mail { background: #7C3AED; }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .feedback-box { margin-top: 16px; padding: 12px 16px; border-radius: 10px; font-weight: 700; display: none; }
+
+    @media print {
+      body { background: white !important; padding: 0 !important; }
+      .actions-bar, .btn, .box-tag { display: none !important; }
+      .header-card, .section-card { box-shadow: none !important; border: 1px solid #ccc !important; }
+      .pycharm-window { background: #1E1F22 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .row-target { background-color: #FEE2E2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- بيانات الطالبة -->
+  <header class="header-card">
+    <div class="title-row">
+      <div class="main-title">✨ ورقة عمل (11) - حذف البيانات من قاعدة البيانات</div>
+      <div class="badge">الصف الحادي عشر • تقنية المعلومات</div>
+    </div>
+    <div class="student-fields">
+      <div class="field-group">
+        <label for="studentName">🌸 اسم المتعلمة:</label>
+        <input type="text" id="studentName" placeholder="اكتبي اسمك الثلاثي هنا...">
+      </div>
+      <div class="field-group">
+        <label for="studentClass">🏫 الصف والفصل:</label>
+        <input type="text" id="studentClass" placeholder="مثال: 11 علمي / 2">
+      </div>
+    </div>
+  </header>
+
+  <!-- الجدول والشروط (اتجاه LTR من اليسار لليمين) -->
+  <section class="section-card">
+    <h2 class="section-title">📊 جدول معالم الكويت (landmarks) والصفوف المستهدفة</h2>
+    <div class="task-banner">
+      💡 <strong>المطلوب:</strong> احذف الصفوف التي سنة إنشائها (<code>year</code>) قبل <strong>2000</strong> وسعر التذكرة (<code>price</code>) أكبر من <strong>دينار واحد</strong>.
+    </div>
+
+    <!-- تم ضبط اتجاه الجدول من اليسار إلى اليمين -->
+    <div class="table-container" dir="ltr">
+      <table>
+        <thead>
+          <tr>
+            <th>id</th>
+            <th>name</th>
+            <th>location</th>
+            <th>category</th>
+            <th>year</th>
+            <th>price</th>
+            <th>Status (حالة الصف)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-target">
+            <td>1</td>
+            <td>Kuwait Towers (أبراج الكويت)</td>
+            <td>Al-Asimah</td>
+            <td>Tourism</td>
+            <td>1979</td>
+            <td>3.00 KD</td>
+            <td><span class="chip-del">🗑️ مطلوب حذفه (year &lt; 2000 and price &gt; 1)</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Souq Al-Mubarakiya (سوق المباركية)</td>
+            <td>Al-Murqab</td>
+            <td>Traditional</td>
+            <td>1897</td>
+            <td>0.00 KD</td>
+            <td><span class="chip-keep">✔️ يبقى (السعر ليس أكبر من 1)</span></td>
+          </tr>
+          <tr class="row-target">
+            <td>3</td>
+            <td>Kuwait National Museum (متحف الكويت الوطني)</td>
+            <td>Al-Qibla</td>
+            <td>Cultural</td>
+            <td>1983</td>
+            <td>1.50 KD</td>
+            <td><span class="chip-del">🗑️ مطلوب حذفه (year &lt; 2000 and price &gt; 1)</span></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>The Scientific Center (المركز العلمي)</td>
+            <td>Salmiya</td>
+            <td>Scientific</td>
+            <td>2000</td>
+            <td>4.00 KD</td>
+            <td><span class="chip-keep">✔️ يبقى (السنة ليست قبل 2000)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- محاكي بيئة PyCharm -->
+  <section class="section-card">
+    <h2 class="section-title">💻 بيئة كتابة التعليمات البرمجية (محاكي PyCharm)</h2>
+    <div class="pycharm-window">
+      <div class="pycharm-header">
+        <div style="display:flex; gap:6px;">
+          <span style="width:10px; height:10px; background:#ED6A5E; border-radius:50%; display:inline-block;"></span>
+          <span style="width:10px; height:10px; background:#F5BF4F; border-radius:50%; display:inline-block;"></span>
+          <span style="width:10px; height:10px; background:#62C554; border-radius:50%; display:inline-block;"></span>
+        </div>
+        <div class="pycharm-tabs">landmark_delete / data_delete2.py</div>
+        <div style="font-size:0.75rem; color:#8C8E94;">Python 3.11</div>
+      </div>
+
+      <div class="pycharm-editor">
+        <div class="line-numbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12</div>
+        <div class="code-area">
+          <div><span class="c-kw">import</span> sqlite3</div>
+          <div><span class="c-cm"># Connect to the database</span></div>
+          <div>connection = sqlite3.<span class="c-fn">connect</span>(<span class="c-str">'Kuwait_landmarks.db'</span>)</div>
+          <div>cursor = connection.<span class="c-fn">cursor</span>()</div>
+          <div><span class="c-cm"># Delete Data</span></div>
+          <div>cursor.<span class="c-fn">execute</span>(</div>
+          
+          <!-- مكان كتابة المتعلمة المخصص -->
+          <div class="student-code-box">
+            <span class="box-tag">✍️ مكان كتابة استعلام الحذف SQL الخاص بكِ:</span>
+            <textarea id="sqlCode" class="code-textarea" rows="2" placeholder="اكتبي هنا: '''DELETE FROM ... WHERE ...'''"></textarea>
+          </div>
+          
+          <div>)</div>
+          <div><span class="c-fn">print</span>(<span class="c-str">'Number of rows deleted:'</span>, connection.total_changes)</div>
+          <div><span class="c-cm"># Commit changes</span></div>
+          <div>connection.<span class="c-fn">commit</span>()</div>
+          <div><span class="c-cm"># Close database</span></div>
+          <div>connection.<span class="c-fn">close</span>()</div>
+        </div>
+      </div>
+
+      <div class="output-panel">
+        <div id="consoleOutput">Run Console: بانتظار كتابة المتعلمة للكود والضغط على تشغيل...</div>
+        <div>Process finished</div>
+      </div>
+    </div>
+
+    <div id="feedbackBox" class="feedback-box"></div>
+
+    <!-- أزرار الإجراءات -->
+    <div class="actions-bar">
+      <button class="btn btn-test" onclick="runCode()">▶️ تحقق من الكود ونفّذ</button>
+      <button class="btn btn-pdf" onclick="exportPDF()">📄 حفظ الحل كملف PDF</button>
+      <button class="btn btn-mail" onclick="sendMail()">✉️ إرسال الحل لإيميل المعلمة</button>
+    </div>
+  </section>
+</div>
+
+<script>
+  function runCode() {
+    const code = document.getElementById('sqlCode').value.trim();
+    const clean = code.toLowerCase().replace(/['"]/g, '').replace(/\s+/g, ' ');
+    const consoleOut = document.getElementById('consoleOutput');
+    const feedback = document.getElementById('feedbackBox');
+
+    if (!code) {
+      alert('يرجى كتابة تعليمة الحذف داخل المستطيل المخصص أولاً!');
+      return;
+    }
+
+    const hasDelete = clean.includes('delete from landmarks');
+    const hasYear = clean.includes('year < 2000') || clean.includes('year<2000');
+    const hasAnd = clean.includes('and');
+    const hasPrice = clean.includes('price > 1') || clean.includes('price>1');
+
+    feedback.style.display = 'block';
+    if (hasDelete && hasYear && hasAnd && hasPrice) {
+      consoleOut.innerHTML = '<span style="color:#6AAB73;">Number of rows deleted: 2</span>';
+      feedback.style.background = '#D1FAE5';
+      feedback.style.color = '#065F46';
+      feedback.innerHTML = '🎉 أحسنتِ يا بطلة! صياغة استعلام الحذف صحيحة تماماً وتم حذف (2) من الصفوف المستهدفة بنجاح.';
+    } else {
+      consoleOut.innerHTML = '<span style="color:#EF4444;">Syntax Error: خطأ في صياغة جملة الحذف SQL</span>';
+      feedback.style.background = '#FEE2E2';
+      feedback.style.color = '#991B1B';
+      feedback.innerHTML = '⚠️ راجعي الشروط وتأكدي من كتابتها بالصيغة الصحيحة:<br><code>DELETE FROM landmarks WHERE year &lt; 2000 AND price &gt; 1</code>';
+    }
+  }
+
+  function checkInputs() {
+    const name = document.getElementById('studentName').value.trim();
+    const cls = document.getElementById('studentClass').value.trim();
+    if (!name || !cls) {
+      alert('فضلاً اكتبي اسمك الثلاثي وصفك الدراسي في الأعلى.');
+      return false;
+    }
+    return true;
+  }
+
+  function exportPDF() {
+    if (!checkInputs()) return;
+    window.print();
+  }
+
+  function sendMail() {
+    if (!checkInputs()) return;
+    const name = document.getElementById('studentName').value.trim();
+    const cls = document.getElementById('studentClass').value.trim();
+    const code = document.getElementById('sqlCode').value.trim();
+    const email = "t273000@moe.edu.kw";
+
+    const subject = encodeURIComponent(`حل ورقة عمل 11 - حادي عشر: ${name} (${cls})`);
+    const body = encodeURIComponent(
+      `السلام عليكم ورحمة الله وبركاته،\n` +
+      `معلمتي الفاضلة، هذا حلي لورقة عمل (11) الخاصة بحذف البيانات في SQLite:\n\n` +
+      `👤 اسم الطالبة: ${name}\n` +
+      `🏫 الصف: ${cls}\n\n` +
+      `💻 كود الاستعلام الذي قمت بكتابته:\n` +
+      `${code}\n\n` +
+      `عدد الصفوف التي تم حذفها: 2\n\n` +
+      `مع الشكر والتقدير.`
+    );
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+  }
+</script>
+
+</body>
+</html>
